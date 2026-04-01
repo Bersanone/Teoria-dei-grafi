@@ -4,6 +4,8 @@ Questa versione usa le liste di adiacenza list[list[int] per rappresentare le co
 Partiamo da un nodo e iniziamo a visitare tutti i suoi vicini, un nodo non può essere ripercorso più di una volta
 Se incontriamo un nodo già visitato dobbiamo fare marcia indietro in modo recursivo per provare strade diverse e trovare nodi mai percorsi
 
+Time: O(V+E)
+Space: O(V)
 '''
 
 
