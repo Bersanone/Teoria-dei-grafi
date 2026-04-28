@@ -131,7 +131,7 @@ class topologicalSortAdjacencyList:
 
     #Se volessimo trovare il percorso più lungo dovremmo moltiplicare tutti i valore dei vertici per -1
     #Una volta trovato il percorso più corto (siamo nel range negativo) lo rimpoltiplichiamo per -1 ottenendo il numero intero
-    #Flippando il numero avremmo la strada più lunga
+    #Flippando il numero avremmo la strada più lungav
     def dagShortestPath(self, graph : dict[int, list[Edge]], start : int, numNodes : int) -> list[int]:
 
         #Calcoliamo l'ordinamento topologico del grafo.
