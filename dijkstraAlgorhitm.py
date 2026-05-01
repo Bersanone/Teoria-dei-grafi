@@ -7,17 +7,9 @@ Possiamo trovare la strada migliore da un nodo di partenza ad uno di arrivo, sol
 
 
 
-
-Da finire di implementare ipq con D-Heap custom e commentare il codice
-
-
-
-
-
-
+COMMENTARE IL CODICE PER SPIEGARE IL FUNZIONAMENTO DELL'ALGORITMO E DELLA STRUTTURA DATI UTILIZZATA
 '''
 
-import heapq
 from collections import deque
 
 
@@ -54,11 +46,13 @@ class dijkstraAlgorithmWithDHeap:
 
         self.n = n
         self.graph = [[] for _ in range(n)]
+        self.edgeCount = 0
 
     
 
     def addEdge(self, fromNode : int, to : int, cost : float) -> None:
         self.graph[fromNode].append(self.Edge(fromNode, to, cost))
+        self.edgeCount += 1
 
     
     def getGraph(self) -> list[list[Edge]]:
@@ -71,41 +65,43 @@ class dijkstraAlgorithmWithDHeap:
         degree = self.edgeCount // self.n
         ipq = self.DHeap()
         ipq.MinIndex(degree, self.n)
-        ipq.
+        ipq.insert(start, 0.0)
+
 
         self.dist = [float('inf')] * self.n
         self.dist[start] = 0
 
-        pq = []
 
-        heapq.heappush(pq, self.Node(start, 0))
 
         visited = [False] * self.n
         self.prev = [None] * self.n
 
 
-        while pq:
-            node = heapq.heappop(pq)
+        while ipq:
+            nodeid = ipq.peekMinKeyIndex()
 
-            visited[node.id] = True
+            minValue = ipq.poolMinValue()
 
-            if self.dist[node.id] < node.value:
+            if minValue < self.dist[nodeid]:
                 continue
 
-
-            for edge in self.graph[node.id]:
+            for edge in self.graph[nodeid]:
                 if visited[edge.to]:
                     continue
 
-                new_dist = self.dist[node.id] + edge.cost
+                new_dist = self.dist[nodeid] + edge.cost
+
 
                 if new_dist < self.dist[edge.to]:
-                    self.prev[edge.to] = edge.fromNode
+                    self.prev[edge.to] = nodeid
                     self.dist[edge.to] = new_dist
-                    heapq.heappush(pq, self.Node(edge.to, self.dist[edge.to]))
+                    if ipq.contains(edge.to):
+                        ipq.decrease(edge.to, new_dist)
+                    else:
+                        ipq.insert(edge.to, new_dist)
 
 
-            if node.id == end:
+            if nodeid == end:
                 return self.dist[end]
             
         return float('inf')
@@ -140,6 +136,10 @@ class dijkstraAlgorithmWithDHeap:
             self.pm = []
             self.im = []
             self.values = []
+
+
+        def __bool__(self):
+            return self.sz > 0
     
 
 
@@ -158,7 +158,7 @@ class dijkstraAlgorithmWithDHeap:
 
             self.values = [0] * self.N
 
-            for i in range(self.n):
+            for i in range(self.N):
                 self.parent[i] = (i-1) // self.D
                 self.child[i] = i * self.D + 1
                 self.pm[i] = self.im[i] = -1
@@ -172,24 +172,104 @@ class dijkstraAlgorithmWithDHeap:
             return self.sz == 0
         
 
-        def insert(self, )
+        def decrease(self, k1 : int, value : object) -> None:
+            if not self.contains(k1):
+                raise ValueError("index does not exist in the heap")
+            self.valueNotNull(value)
+            if value < self.values[k1]:
+                self.values[k1] = value
+                self.swim(self.pm[k1])
         
+
+        def insert(self, ki : int, value : object ) -> None:
+            if self.contains(ki):
+                raise ValueError("index already exists in the heap")
+            self.valueNotNull(value)
+            self.pm[ki] = self.sz
+            self.im[self.sz] = ki
+            self.values[ki] = value
+            self.sz += 1
+            self.swim(self.sz - 1)
+
+
+        def peekMinKeyIndex(self) -> int:
+            if self.isEmpty():
+                raise ValueError("Priority queue underflow")
+            return self.im[0]
+        
+
+        def peekMinValue(self) -> object:
+            if self.isEmpty():
+                raise ValueError("Priority queue underflow")
+            return self.values[self.im[0]]
+        
+
+        def poolMinValue(self) -> object:
+            if self.isEmpty():
+                raise ValueError("Priority queue underflow")
+            minValue = self.peekMinValue()
+            self.delete(self.peekMinKeyIndex())
+            return minValue
+        
+        def poolMInKeyIndex(self) -> int:
+            if self.isEmpty():
+                raise ValueError("Priority queue underflow")
+            minkeyIndex = self(self.peekMinKeyIndex)
+            self.delete(minkeyIndex)
+            return minkeyIndex
+
 
 
 
         #Helpers
 
 
+        def delete(self, k1 : int) -> None:
+            if not self.contains(k1):
+                raise ValueError("index does not exist in the heap")
+            i = self.pm[k1]
+            value = self.values[k1]
+
+            self.sz -= 1
+
+            self.swap(i, self.sz)
+
+            self.sink(i)
+            self.swim(i)
+
+
+            
+            self.pm[k1] = -1
+            self.im[self.sz] = -1
+            self.values[k1] = None
+            
+            
+            return value
+
+
+
+
+
+
+
+
+        def contains(self, ki : int) -> bool:
+            self.valueNotNull(ki)
+            return self.pm[ki] != -1
+
+
         def sink(self, i : int) -> None:
             j = self.minChild(i)
             while j != -1:
+                if self.less(i,j):
+                    break
                 self.swap(i, j)
                 i = j
                 j = self.minChild(i)
 
 
         def swim(self, i : int) -> None:
-            while self.less(i, self.parent[i]):
+            while i>0 and self.less(i, self.parent[i]):
                 self.swap(i, self.parent[i])
                 i = self.parent[i]
 
@@ -204,15 +284,15 @@ class dijkstraAlgorithmWithDHeap:
         def minChild(self, i : int) -> int:
             index = -1
             from_ = self.child[i]
-            to = min(self.sz, self.from_ + self.D)
+            to = min(self.sz, from_ + self.D)
 
             j = from_
 
             while j < to:
-                if self.less(j, index):
-                    index = i = j
-                    j += 1
-                return index
+                if index == -1 or self.less(j, index):
+                    index = j
+                j += 1
+            return index
 
 
 
@@ -228,6 +308,19 @@ class dijkstraAlgorithmWithDHeap:
                 
 
 
+p = dijkstraAlgorithmWithDHeap()
+p.DijkstrasShortestPathAdjacencyList(5)
+p.addEdge(0, 1, 10)
+p.addEdge(0, 2, 5)
+p.addEdge(1, 2, 2)
+p.addEdge(1, 3, 1)
+p.addEdge(2, 1, 3)
+p.addEdge(2, 3, 9)
+p.addEdge(2, 4, 2)
+p.addEdge(3, 4, 4)
+p.addEdge(4, 3, 6)
+print(p.Dijkstra(0, 4))
+print(p.reconstructPath(0, 4))
 
 
         
