@@ -1,13 +1,7 @@
-'''
-L'algoritmo di Bellman-Ford è un algoritmo per trovare i percorsi più brevi da un nodo start ad un node end.
-A differenza di Dijkstra questo algoritmo funziona anche con archi negativi.
-
-Tempi: O(V*E) dove V è il numero di nodi e E è il numero di archi
-Spazio: O(V) per memorizzare le distanze
-'''
 
 
-class BellmanFord:
+
+class BellmanFordEdgeList:
 
     #Inizializzazione della classe Edge
 
@@ -18,19 +12,6 @@ class BellmanFord:
             self.from_node = from_node
             self.to = to
             self.weight = weight
-
-
-
-    def createGraph(self, v : int) -> list:
-        graph = []
-        for i in range(v):
-            graph.append([])
-
-        return graph
-    
-
-    def addEdge(self, graph : list, from_node : int, to : int, cost : float) -> None:
-        graph[from_node].append(self.Edge(from_node,to,cost))
 
 
         '''
@@ -52,24 +33,33 @@ class BellmanFord:
 
     
 
-    def bellmanFord(self,graph : list, v : int, start : int) -> list:
+    def bellmanFord(self,edges : Edge, v : int, start : int) -> list:
     
      dist = [float('inf')] * v
 
      dist[start] = 0
 
+     relaxedEdege = True
+
+
 
      for _ in range(v -1):
-            for e in graph:
-                for edge in e:
+            if not relaxedEdege:
+                 break
+            relaxedEdege = False
+            for edge in edges:
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = dist[edge.from_node] + edge.weight
+                        relaxedEdege = True
 
      for _ in range(v-1):
-            for e in graph:
-                for edge in e:
+            if not relaxedEdege:
+                    break
+            relaxedEdege = False
+            for edge in edges:
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = float("-inf")
+                        relaxedEdege = True
 
      return dist
     
@@ -80,20 +70,20 @@ class BellmanFord:
         v = 9
         start = 0
 
-        graph = self.createGraph(v)
+        edges = [None] * e
 
-        self.addEdge(graph, 0, 1, 1)
-        self.addEdge(graph, 1, 2, 1)
-        self.addEdge(graph, 2, 4, 1)
-        self.addEdge(graph, 4, 3, -3)
-        self.addEdge(graph, 3, 2, 1)
-        self.addEdge(graph, 1, 5, 4)
-        self.addEdge(graph, 1, 6, 4)
-        self.addEdge(graph, 5, 6, 5)
-        self.addEdge(graph, 7, 6, 4)
-        self.addEdge(graph, 5, 7, 3)
+        edges[0] = self.Edge( 0, 1, 1)
+        edges[1] = self.Edge( 1, 2, 1)
+        edges[2] = self.Edge( 2, 4, 1)
+        edges[3] = self.Edge( 4, 3, -3)
+        edges[4] = self.Edge( 3, 2, 1)
+        edges[5] = self.Edge( 1, 5, 4)
+        edges[6] = self.Edge( 1, 6, 4)
+        edges[7] = self.Edge( 5, 6, 5)
+        edges[8] = self.Edge( 7, 6, 4)
+        edges[9] = self.Edge( 5, 7, 3)
 
-        res = self.bellmanFord(graph,v,start)
+        res = self.bellmanFord(edges,v,start)
 
         for i in range(v):
             print(f"Distance from node {start} to node {i} is: {res[i]}")
@@ -101,6 +91,6 @@ class BellmanFord:
 
 
 
-p = BellmanFord()
+p = BellmanFordEdgeList()
 
 p.main()
