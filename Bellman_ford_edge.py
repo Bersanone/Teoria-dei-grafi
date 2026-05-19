@@ -28,16 +28,28 @@ class BellmanFordEdgeList:
         * Rilevamento Divergenze: Esegue una |V|-esima iterazione di validazione. 
         * Se la condizione D[u] + w(u,v) < D[v] risulta ancora soddisfatta, segnala
         * se trova la presenza di un ciclo negativo raggiungibile dalla sorgente imposta -inf (divergenza a -inf).
+
+
+
+        A differenza dell'implementazione con lista di adiacenza, in questa implementazione con edge list, rilassiamo direttamente tutti gli archi presenti nella lista degli archi, 
+        senza dover iterare su ogni vertice del grafo e su ogni arco presente in ogni vertice, rendendo l'algoritmo più efficiente in termini di tempo di esecuzione.
+
+        Grazie al boolean relaxedEdge, possiamo interrompere l'algoritmo prima di completare tutte le iterazioni se non viene rilassato nessun arco durante un'intera iterazione,
+
+
+        Inoltre passiamo Edge come parametro alla funzione bellmanFord, invece di passare la lista di adiacenza del grafo, rendendo l'algoritmo più semplice da implementare e più veloce, essendo che non dobbiamo iterare su ogni vertice del grafo e su ogni arco presente in ogni vertice, ma rilassiamo direttamente tutti gli archi presenti nella lista degli archi.
         '''
 
 
     
-
+    #Passiamo il vertice di partenza, il numero di vertici e la lista degli archi del grafo rappresentato come edge list alla funzione bellmanFord
     def bellmanFord(self,edges : Edge, v : int, start : int) -> list:
     
      dist = [float('inf')] * v
 
      dist[start] = 0
+
+     #Impostiamo una variabile booleana per verificare se è stato rilassato almeno un arco durante ogni iterazione, se non viene rilassato nessun arco, significa che abbiamo già trovato le distanze minime e possiamo interrompere l'algoritmo prima di completare tutte le iterazioni
 
      relaxedEdege = True
 
@@ -46,10 +58,12 @@ class BellmanFordEdgeList:
      for _ in range(v -1):
             if not relaxedEdege:
                  break
+            #Impostiamo a False la variabile booleana all'inizio di ogni iterazione
             relaxedEdege = False
             for edge in edges:
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = dist[edge.from_node] + edge.weight
+                        #Nel caso in cui venga rilassato almeno un arco, impostiamo a True la variabile booleana
                         relaxedEdege = True
 
      for _ in range(v-1):
@@ -59,6 +73,7 @@ class BellmanFordEdgeList:
             for edge in edges:
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = float("-inf")
+                        #Nel caso in cui venga rilassato almeno un arco, impostiamo a True la variabile booleana
                         relaxedEdege = True
 
      return dist

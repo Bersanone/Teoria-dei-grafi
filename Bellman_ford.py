@@ -20,7 +20,7 @@ class BellmanFord:
             self.weight = weight
 
 
-
+    #Funzione di supporto per creare un grafo rappresentato come lista di adiacenza
     def createGraph(self, v : int) -> list:
         graph = []
         for i in range(v):
@@ -53,24 +53,33 @@ class BellmanFord:
     
 
     def bellmanFord(self,graph : list, v : int, start : int) -> list:
+     
+     #Impostiamo le distanze a infinito tranne quella del nodo di partenza che è 0
     
      dist = [float('inf')] * v
 
      dist[start] = 0
 
+     #Cicliamo per |V|-1 volte rilassando tutti gli archi
+
 
      for _ in range(v -1):
+            #Iteriamo su ogni vertice del grafo
             for e in graph:
+                #per ogni arco presente nel vertice corrente
                 for edge in e:
+                    #Se la distanza fino al nodo sorgente dell'arco  + il peso dell'arco è minore della distanza al nodo di arrivo, aggiorniamo la distanza al nodo di arrivo
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = dist[edge.from_node] + edge.weight
-
+     #eseguiamo un secondo set di iterazioni per rilevare tutti i nodi che possiedono un ciclo bnegativo raggiungibile dalla sorgente dell'arco 
      for _ in range(v-1):
             for e in graph:
                 for edge in e:
+                    #Se troviamo un arco minore della distanza al nodo di arrivo, significa che è presente un ciclo negativo raggiungibile dalla sorgente, quindi impostiamo la distanza al nodo di arrivo a -inf
                     if dist[edge.from_node] + edge.weight < dist[edge.to]:
                         dist[edge.to] = float("-inf")
 
+     #Restituiamo la lista delle distanze
      return dist
     
 
