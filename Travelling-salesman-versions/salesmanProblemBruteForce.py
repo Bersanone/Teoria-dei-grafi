@@ -1,6 +1,6 @@
 class tspBrute:
 
-    def tsp (self,matrix : list[list[float]]) -> int:
+    def tsp (self,matrix : list[list[float]]) -> list[int]:
 
         n = len(matrix)
 
@@ -13,7 +13,7 @@ class tspBrute:
 
         bestTourCost = float("inf")
 
-        while self.nextPermutation(permutation):
+        while True:
 
             tourCost = self.computeTourCost(permutation, matrix)
 
@@ -21,6 +21,9 @@ class tspBrute:
 
                 bestTourCost = tourCost
                 bestTour = permutation.copy()
+            
+            if not self.nextPermutation(permutation):
+                break
 
 
         return bestTour
