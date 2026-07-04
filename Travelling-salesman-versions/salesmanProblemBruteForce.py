@@ -1,4 +1,19 @@
+
+'''
+Quetso file mostra come risolvere il TSP utilizzando un approccio brute force
+Essendo che la time complexity è in ordine di O(n!)
+
+Complessityà temporale: O(n!)
+
+'''
+
+
+
+
+
 class tspBrute:
+    
+    #Data un nxn grafo completo rappresnetato come una matrice adiacente, questo metodo trova il best tour che visita tutti i nodi mentre minimizzano il costo di visita complessivo
 
     def tsp (self,matrix : list[list[float]]) -> list[int]:
 
@@ -12,7 +27,7 @@ class tspBrute:
         bestTour = permutation.copy()
 
         bestTourCost = float("inf")
-
+        #Proviamo tutti n! tour
         while True:
 
             tourCost = self.computeTourCost(permutation, matrix)
@@ -29,8 +44,13 @@ class tspBrute:
         return bestTour
 
 
-
-
+    '''
+    
+    Generiamo la prossima  permutazione ordinata in-place (Salta le permutazioni ripetute)
+    Chioamarlo quando l'array è già alla più alta permutazione restituisce falso
+    Iniziamo con la permutazione più piccola e utilizziamo ul ciclo per generare ogni permutazione successiva
+    
+    '''
 
     def nextPermutation(self, sequence : list[int]) -> bool:
 
@@ -65,12 +85,14 @@ class tspBrute:
 
         cost = 0
 
+        #Computiamo il costo di andata per ogni città
+
         for i in range(1,len(matrix)):
             from_ = tour[i -1]
             to = tour[i]
             cost += matrix[from_][to]
 
-
+        #Computiamo il costo di ritorno alla città di start
         last = tour[len(matrix) - 1]
 
         first = tour[0]

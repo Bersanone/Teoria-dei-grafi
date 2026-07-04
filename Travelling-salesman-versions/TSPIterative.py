@@ -1,8 +1,30 @@
+'''
+Dato un grafo pesato completo di N nodi, dobbiamo trovare il ciclo Hamiltoniano a minor costo (un tour che visita ogni nodo esattemente una volta sola e ritorna al nodo di partenza)
+
+Questo approccio iterativo (bottom-up) costruisce soluzioni per incrementare la taglia del subset, per ogni subset di 5 nodi visitati e ogni endpoint node i size computiamo il costo minimoper raggiungere i avendo visistato i nodi in Size
+
+    memo[next][S | (1 << next)] = min over end in S of
+        memo[end][S] + distance[end][next]
+
+Dopo aver riempito le tabelle chiudiamo il tour connettendoci indietro al nodo di partenza ed esegue un backtrack attreverso la tabella per ricostruire il path ottimale
+
+ Time:  O(n^2 * 2^n)
+ Space: O(n * 2^n)
+
+
+'''
+
+
+
 class TSPIterative:
+
+    #Dichiarazione del costruttore
 
     def __init__(self,start : int, distance : list[list[float]]):
 
         self.n = len(distance)
+
+        #Check dei nodi
 
         if self.n <= 2:
             raise ValueError("Il numero dei nodi deve essere maggiore di 2.")
@@ -25,10 +47,19 @@ class TSPIterative:
 
 
     
+
+    #Ritorna una lista di tour ottimali per il TSP
+    
+    #Restituiamo una lista ordinata di indici dei nodi  formando il tour ottimale (inizia e finisce con il nodo di partenza)
     def getTour(self) -> list[int]:
         if not self.runSolver:
             self.solve()
         return self.tour
+    
+
+    #Restituisce il costo minimo del tour
+
+    #Restituisce il costyo totale del ciclo hamiltoniano
     
 
     def getTourCost(self) -> float:
@@ -45,6 +76,13 @@ class TSPIterative:
     
     #Funzione di solver
 
+    #Solve TSP ed esegue il chacing dei risultati, chiamate subseguenti sono no-ops
+
+
+    #Fase 1: riempiamo la tabella DP bottom-up per subset di 2..N
+    #Fase 2: Chiudiamo il tour connetetndo l'ultimo nodo indietro all'inzio
+    #Fase 3: Eseguiamo il backtrack attraverso la tabella per ricostruire il tour
+
     def solve(self) -> None:
         if self.runSolver:
             return
@@ -53,15 +91,18 @@ class TSPIterative:
         #1 << start → crea una maschera con un solo bit acceso nella posizione di start partendo da sinistra (es. start=2 → 0b0100 , notiamo come l'1 è stato inserito dopo 2 zeri partendo da destra) 
         memo = [[None] * (1 << self.n) for _ in range(self.n)]
 
-        #Fase 1
+        #Fase 1a: riempiamo la tabella memmo con gli edges diretti dal nodo di partenza
 
         for end in range(self.n):
             if end == self.start:
                 continue
+            #memo[end][{start, end}] = distanza da start ad end
+
             memo[end][(1<<self.start) | (1<<end)] = self.distance[self.start][end]
 
 
-        #Fase 1a
+        #Fase 1b: Costruiamo soluzioni per subset di taglia incrementale (3..N)
+        #Per ogni subset proviamo ad estendere il path ad ogni nodo nel subset
 
         for r in range(3,self.n + 1):
             for subset in self.combinations(r, self.n):
@@ -84,6 +125,8 @@ class TSPIterative:
 
         #Fase 2
 
+        #Chiudiamo il tour - trovando il modo più conveniente per ritornare allo start
+
         for i in range(self.n):
             if i == self.start:
                 continue
@@ -92,7 +135,7 @@ class TSPIterative:
                 self.minTourCost = tourCost
 
 
-        #Fase 3
+        #Fase 3 ricostruiamo il tour eseguendo il backtrack attraverso la tabella memo 
 
         lastIndex = self.start
         state = END_STATE
@@ -110,14 +153,14 @@ class TSPIterative:
                     bestIndex = j
                     bestDist = newDist
                 
-                self.tour.append(bestIndex)
-                state = state ^ (1 << bestIndex)
-                lastIndex = bestIndex
+            self.tour.append(bestIndex)
+            state = state ^ (1 << bestIndex)
+            lastIndex = bestIndex
 
-            self.tour.append(self.start)
-            self.tour.reverse()
+        self.tour.append(self.start)
+        self.tour.reverse()
 
-            self.runSolver = True
+        self.runSolver = True
     
 
 
@@ -133,6 +176,15 @@ class TSPIterative:
     #Private helpers
 
     #Costruisce recursivamente le combinazione, decidendo se includer eogni posizione di bit, arretra quando non ci sono abbastanza combinazioni 
+
+    #Genera tutte le bitmask di n bits dove esattamente r bits sono impostati
+
+    #Utilizzato per enumera subset di una data size
+
+
+    #@param r - numero di bits da impostare
+    #@param n - numero totale di bits
+    #@return - lista di interi bitmask 
 
     def __combination(self, set : int,at : int,r : int,n : int,subset : list[int]) -> None:
 
@@ -155,6 +207,10 @@ class TSPIterative:
                 set ^= (1 << i)
 
 
+
+    #Restituisce True se i bit dell'elemento dato non è nel subset bitmask
+
+
     def __notIn(self,elem : int,subset : int) -> bool:
         return ((1 << elem) & subset) == 0
 
@@ -164,10 +220,12 @@ class TSPIterative:
 
 def main() -> None:
 
-        n = 0
-        distanceMatrix = [[] for _ in range(n)]
-        for row in distanceMatrix:
-            row.append(10000)
+        n = 6
+
+        #Assegnamo 10000 come placeholedr
+
+        distanceMatrix =[ [10000] * n for _ in range(n)]
+
         
         distanceMatrix[5][0] = 10
         distanceMatrix[1][5] = 12
@@ -183,5 +241,8 @@ def main() -> None:
         print("Tour ottimale:", solver.getTour())
 
         print("Costo del tour ottimale:", solver.getTourCost())
+
+
+p = main()
 
 
