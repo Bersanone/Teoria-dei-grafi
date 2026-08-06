@@ -2,13 +2,18 @@
 
 #Viene chiamato Eager perchè quando un edge migliore viene trovato , la entry del IPQ viene aggiornata così gli edge non si accumolano mai
 #A differenza della variante lazy che le lascia nellla queue
+
+
+#L'Eager Prims trova l'MST (minimum spanning tree) di un grafo connesso e pesato.
+#Perciò trova il percorso di costo minimo che connette tutti i vertici del grafo senza cicli.
 # 
+#  
 # Tempo algoritmico: O(E log V) dove E è il numero di edges e V il numero di vertici
 # Spazio algoritmico: O(V+E) 
 
 
 from dataclasses import dataclass,field
-
+import math
 
 class EagerPrimsAdjancencyList:
 
@@ -150,7 +155,68 @@ class EagerPrimsAdjancencyList:
         self.graph = graph
         self.solved = False
         self.mstExsists = False
-        self.visited = False
+        self.visited = [False] * self.n
 
 
-        
+    def getMST(self) -> list[Edge]:
+        self.solve()
+        return self.mstExsists if self.mstEdges else None
+
+
+    def getMstCost(self) -> int:
+        self.solve()
+        return self.mstExsists if self.minCostSum else None
+
+
+    def solve(self) -> None:
+        if self.solved == True:
+            return
+        self.solved = True
+        m : int = self.n - 1
+        edgeCount = 0
+        visited = [False] * self.n
+        mstEdges = [self.Edge(0,0,0)] * m
+
+        #Il grado del d-ary heap può impatatre le performance specialmente su grafi densi
+        #la base-2 logaritmica di N è una buona euristica
+
+
+        #Utilizziamo il grado massimo tra 2 e il logaritmo in base 2 del numero di nodi per bilanciare la profondità dell'albero e il numero di figli per nodo.
+        #In questo modo N cresce gradualmente con l'aumento dei nodi, tenendo le operazioni di inserimento e rimozione efficienti.
+
+        degree = max(2, math.floor(math.log2(self.n)))
+
+        ipq = self.MinIndexedDHeap(degree, self.n)
+
+        self.relaxEdgesAtNode(0)
+
+        while not ipq.isEmpty() and edgeCount != m:
+            destNode = ipq.peekMinKeyIndex()
+            edge = ipq.poolMinValue()
+
+            mstEdges[edgeCount+1] = self.Edge(0,0,0)
+            minCostSum += edge.cost
+            self.relaxEdgesAtNode(destNode)
+
+        self.mstExsists = edgeCount == m
+
+    def relaxEdgesAtNode(self, node : int) -> None:
+        self.visited[node] = True
+        for edge in self.graph[node]:
+            if self.visited[edge.to]:
+                continue
+            if self.MinIndexedDHeap.contains(edge.to):
+                self.MinIndexedDHeap.decrease(edge.to,edge)
+            else:
+                self.MinIndexedDHeap.insert(edge.to,edge)
+
+    def createEmptyGraph(self) -> list[list[Edge]]:
+        return [[] for _ in range(self.n)]
+
+    def addDirectedEdge(self, graph : list[list[Edge]], from_ : int, to : int, cost : int) -> None:
+        graph[from_].append(self.Edge(cost,from_,to))
+
+
+    def addUndirectedEdge(self, graph : list[list[Edge]], from_ : int, to : int, cost : int) -> None:
+        self.addDirectedEdge(graph,from_,to,cost)
+        self.addDirectedEdge(graph,to,from_,cost)
