@@ -220,3 +220,141 @@ class EagerPrimsAdjancencyList:
     def addUndirectedEdge(self, graph : list[list[Edge]], from_ : int, to : int, cost : int) -> None:
         self.addDirectedEdge(graph,from_,to,cost)
         self.addDirectedEdge(graph,to,from_,cost)
+
+
+
+
+    def print_mst(self, solver : 'EagerPrimsAdjancencyList') -> None:
+        cost = solver.getMstCost()
+
+        if cost is None:
+            print("MST does not exist")
+        else:
+            print("Mstcost:" + str(cost))
+            for edge in solver.getMstCost():
+                print(f"Edge cost : {edge.cost}, Edge from : {edge.from_}, Edge_to : {edge.to}")
+
+
+
+    #Esempi da invocare per test
+
+
+
+    def exampleDisconnectedGraph(self) -> None:
+        n = 6
+
+        g = self.createEmptyGraph(n)
+
+        self.addUndirectedEdge(g,0,1,1)
+        self.addUndirectedEdge(g,1,2,1)
+        self.addUndirectedEdge(g,2,0,1)
+
+
+
+        self.addUndirectedEdge(g,3,4,1)
+        self.addUndirectedEdge(g,4,5,1)
+        self.addUndirectedEdge(g,5,3,1)
+
+
+        solver = EagerPrimsAdjancencyList(g)
+        self.print_mst(solver)
+
+
+
+    def exampleDisjointFromStart(self) -> None:
+
+        n = 4
+        g = self.createEmptyGraph(n)
+
+        self.addUndirectedEdge(g,1,2,1)
+        self.addUndirectedEdge(g,2,3,1)
+        self.addUndirectedEdge(g,3,1,1)
+
+
+        solver = EagerPrimsAdjancencyList(g)
+        self.print_mst(solver)
+
+
+
+    def exampleSquareGraph(self) -> None:
+        n = 9
+        g = self.createEmptyGraph(n)
+
+        self.addUndirectedEdge(g,0,1,6)
+        self.addUndirectedEdge(g,0,3,3)
+        self.addUndirectedEdge(g,1,2,4)
+        self.addUndirectedEdge(g,1,4,2)
+        self.addUndirectedEdge(g,2,5,12)
+        self.addUndirectedEdge(g,3,4,1)
+        self.addUndirectedEdge(g,3,6,8)
+        self.addUndirectedEdge(g,4,5,7)
+        self.addUndirectedEdge(g,4,7,9)
+        self.addUndirectedEdge(g,5,8,10)
+        self.addUndirectedEdge(g,6,7,11)
+        self.addUndirectedEdge(g,7,8,5)
+
+
+        solver = EagerPrimsAdjancencyList(g)
+        self.print_mst(solver)
+
+
+
+
+    def exampleGraphWithNegativeEdges(self) -> None:
+        n = 7
+        g = self.createEmptyGraph(n)
+
+        self.addUndirectedEdge(g, 0, 1, 9)
+        self.addUndirectedEdge(g, 0, 2, 0)
+        self.addUndirectedEdge(g, 0, 3, 5)
+        self.addUndirectedEdge(g, 0, 5, 7)
+        self.addUndirectedEdge(g, 1, 3, -2)
+        self.addUndirectedEdge(g, 1, 4, 3)
+        self.addUndirectedEdge(g, 1, 6, 4)
+        self.addUndirectedEdge(g, 2, 5, 6)
+        self.addUndirectedEdge(g, 3, 5, 2)
+        self.addUndirectedEdge(g, 3, 6, 3)
+        self.addUndirectedEdge(g, 4, 6, 6)
+        self.addUndirectedEdge(g, 5, 6, 1)
+
+
+        solver = EagerPrimsAdjancencyList(g)
+        self.print_mst(solver)
+
+
+    def exampleConnectedGraph(self) -> None:
+        n = 10
+        g = self.createEmptyGraph(n)
+
+        self.addUndirectedEdge(g, 0, 1, 5)
+        self.addUndirectedEdge(g, 1, 2, 4)
+        self.addUndirectedEdge(g, 2, 9, 2)
+        self.addUndirectedEdge(g, 0, 4, 1)
+        self.addUndirectedEdge(g, 0, 3, 4)
+        self.addUndirectedEdge(g, 1, 3, 2)
+        self.addUndirectedEdge(g, 2, 7, 4)
+        self.addUndirectedEdge(g, 2, 8, 1)
+        self.addUndirectedEdge(g, 9, 8, 0)
+        self.addUndirectedEdge(g, 4, 5, 1)
+        self.addUndirectedEdge(g, 5, 6, 7)
+        self.addUndirectedEdge(g, 6, 8, 4)
+        self.addUndirectedEdge(g, 4, 3, 2)
+        self.addUndirectedEdge(g, 5, 3, 5)
+        self.addUndirectedEdge(g, 3, 6, 11)
+        self.addUndirectedEdge(g, 6, 7, 1)
+        self.addUndirectedEdge(g, 3, 7, 2)
+        self.addUndirectedEdge(g, 7, 8, 6)
+
+
+        solver = EagerPrimsAdjancencyList(g)
+        self.print_mst(solver)
+
+
+
+
+
+
+    
+        
+
+
